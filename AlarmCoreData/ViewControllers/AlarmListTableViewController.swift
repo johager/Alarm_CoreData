@@ -21,13 +21,11 @@ class AlarmListTableViewController: UITableViewController {
     // MARK: - Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        print(#function)
         guard segue.identifier == Strings.showAlarmDetails,
               let indexPath = tableView.indexPathForSelectedRow,
               let destination = segue.destination as? AlarmDetailTableViewController
         else { return }
         
-        print("\(#function) - set destination.alarm")
         destination.alarm = AlarmController.shared.alarms[indexPath.row]
     }
 }

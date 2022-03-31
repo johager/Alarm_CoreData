@@ -17,22 +17,22 @@ class AlarmDetailTableViewController: UITableViewController {
     
     // MARK: - Properties
     
-    var alarm: Alarm? {
-        didSet {
-            print("\(#function) - didSet alarm")
-        }
-    }
+    var alarm: Alarm?
     
     private var alarmIsOn = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("\(#function)")
         updateViews()
     }
 
     func updateViews() {
-        guard let alarm = alarm else { return }
+        guard let alarm = alarm
+        else {
+            title = "Add Alarm"
+            return
+        }
+        title = "Edit Alarm"
         alarmFireDatePicker?.date = alarm.fireDate
         alarmTitleTextField?.text = alarm.title
         alarmIsOn = alarm.isEnabled
