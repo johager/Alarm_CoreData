@@ -7,7 +7,7 @@
 
 import CoreData
 
-class AlarmController {
+class AlarmController: AlarmScheduler {
     
     static let shared = AlarmController()
     
@@ -24,8 +24,11 @@ class AlarmController {
     // MARK: - CRUD
     
     func createAlarm(withTitle title: String, andFireDate fireDate: Date, isEnabled: Bool) {
-        alarms.append(Alarm(title: title, fireDate: fireDate, isEnabled: isEnabled))
+        let alarm = Alarm(title: title, fireDate: fireDate, isEnabled: isEnabled)
+        alarms.append(alarm)
         saveToPersistentStore()
+        
+        scheduleUserNotifications(for: alarm)
     }
     
     func fetchAlarms() {
@@ -39,13 +42,30 @@ class AlarmController {
     }
     
     func update(_ alarm: Alarm, title: String, fireDate: Date, isEnabled: Bool) {
+        let previousFireDate = alarm.fireDate
+        let previousIsEnabled = alarm.isEnabled
+        
         alarm.set(title: title, fireDate: fireDate, isEnabled: isEnabled)
         saveToPersistentStore()
+        
+        guard fireDate != previousFireDate || isEnabled != previousIsEnabled else { return }
+        
+        cancelUserNotifications(for: alarm)
+        
+        guard isEnabled else { return }
+        
+        scheduleUserNotifications(for: alarm)
     }
     
     func toggleIsEnabled(for alarm: Alarm) {
         alarm.isEnabled.toggle()
         saveToPersistentStore()
+        
+        if alarm.isEnabled {
+            scheduleUserNotifications(for: alarm)
+        } else {
+            cancelUserNotifications(for: alarm)
+        }
     }
     
     func toggleIsEnabledForAlarm(atIndex index: Int) {
@@ -56,8 +76,11 @@ class AlarmController {
         if let index = alarms.firstIndex(of: alarm) {
             alarms.remove(at: index)
         }
+        
         CoreDataStack.context.delete(alarm)
         saveToPersistentStore()
+        
+        cancelUserNotifications(for: alarm)
     }
     
     func deleteAlarm(atIndex index: Int) {
