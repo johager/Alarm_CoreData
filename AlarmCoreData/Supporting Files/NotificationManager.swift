@@ -19,19 +19,11 @@ class NotificationManager: NSObject {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             if granted {
                 print("we have permission to send notifications")
-                self.setUp()
+                UNUserNotificationCenter.current().delegate = self
             } else if let error = error {
                 print("error obtaining permission to send notifications: \(error.localizedDescription)")
             }
         }
-    }
-    
-    func setUp() {
-        UNUserNotificationCenter.current().delegate = self
-        
-//        let action = UNNotificationAction(identifier: Strings.notificationActionIdentifier, title: "Alarm", options: [])
-//        let category = UNNotificationCategory(identifier: Strings.notificationCategoryIdentifier, actions: [action], intentIdentifiers: [], options: [.customDismissAction])
-//        UNUserNotificationCenter.current().setNotificationCategories([category])
     }
 }
 
